@@ -3,3 +3,5 @@ coverage.html
 release
 vendor
 .tmp
+/.idea
+jabba.exe

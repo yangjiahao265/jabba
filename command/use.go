@@ -1,6 +1,7 @@
 package command
 
 import (
+	log "github.com/Sirupsen/logrus"
 	"github.com/shyiko/jabba/cfg"
 	"os"
 	"path/filepath"
@@ -29,13 +30,28 @@ func usePath(path string) ([]string, error) {
 	rgxp := regexp.MustCompile(regexp.QuoteMeta(filepath.Join(cfg.Dir(), "jdk")) + "[^:]+[:]")
 	// strip references to ~/.jabba/jdk/*, otherwise leave unchanged
 	pth = rgxp.ReplaceAllString(pth, "")
-	if runtime.GOOS == "darwin" {
+
+	goos := runtime.GOOS
+
+	if goos == "darwin" {
 		path = filepath.Join(path, "Contents", "Home")
 	}
+
 	systemJavaHome, overrideWasSet := os.LookupEnv("JAVA_HOME_BEFORE_JABBA")
 	if !overrideWasSet {
 		systemJavaHome, _ = os.LookupEnv("JAVA_HOME")
 	}
+
+	if goos == "windows" {
+		log.Printf("JAVA_HOME has been set to %s", path)
+		return []string{
+			"[Environment]::SetEnvironmentVariable('JAVA_HOME', '" + path + "', 'User')",
+			"$envPath = [Environment]::GetEnvironmentVariable('Path','User').replace('%JAVA_HOME%\\bin;', '')",
+			"$newPath = '%JAVA_HOME%\\bin;' + $envPath",
+			"[Environment]::SetEnvironmentVariable('Path', $newPath, 'User')",
+		}, nil
+	}
+
 	return []string{
 		"export PATH=\"" + filepath.Join(path, "bin") + string(os.PathListSeparator) + pth + "\"",
 		"export JAVA_HOME=\"" + path + "\"",

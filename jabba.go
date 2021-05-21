@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"github.com/shyiko/jabba/util"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"runtime"
 	"sort"
 	"strings"
@@ -19,6 +21,8 @@ import (
 	"github.com/shyiko/jabba/semver"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 var version string
@@ -383,8 +387,46 @@ func use(ver string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	printForShellToEval(out)
+	execPowershell(out...)
+	//printForShellToEval(out)
 	return nil
+}
+
+func execPowershell(command ...string) {
+
+	defaultArgs := []string{"-Command"}
+
+	poshCmd := []string(nil)
+
+	for _, cmd := range command {
+		poshCmd = append(poshCmd, cmd)
+		poshCmd = append(poshCmd, ";")
+	}
+
+	//log.Printf("执行命令：%v\n", poshCmd)
+
+	cmd := exec.Command("powershell", append(defaultArgs, poshCmd...)...)
+
+	out, err := cmd.CombinedOutput()
+
+	result := []byte(nil)
+
+	charsetErr := error(nil)
+
+	if util.IsGBK(out) {
+		result, charsetErr = simplifiedchinese.GBK.NewDecoder().Bytes(out)
+		if charsetErr != nil {
+			log.Println("编码转换失败")
+			return
+		} //gbk 转 utf-8
+	}
+
+	if err != nil {
+		log.Fatalln(string(result))
+	}
+
+	log.Println(string(result))
+
 }
 
 func printForShellToEval(out []string) {
