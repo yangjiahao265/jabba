@@ -11,6 +11,9 @@ clean:
 	rm -f ./jabba
 	rm -rf ./build
 
+clean-windows:
+	rm -rf ./release
+
 fmt:
 	gofmt -l -s -w `find . -type f -name '*.go' -not -path "./vendor/*"`
 
@@ -27,6 +30,15 @@ test-coverage:
 
 build:
 	go build -ldflags "-s -w -X main.version=${VERSION}"
+
+
+# 构建Windows操作系统下的jabba程序
+build-release-windows: clean-windows
+	GOARM=7 gox -verbose \
+	-ldflags "-X main.version=${VERSION}" \
+	-osarch="windows/amd64" \
+	-output="release/{{.Dir}}-${VERSION}-{{.OS}}-{{.Arch}}" .
+
 
 build-release:
 	GOARM=7 gox -verbose \
