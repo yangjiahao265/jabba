@@ -387,8 +387,12 @@ func use(ver string) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	execPowershell(out...)
-	//printForShellToEval(out)
+
+	if runtime.GOOS == "windows" {
+		execPowershell(out...)
+	} else {
+		printForShellToEval(out)
+	}
 	return nil
 }
 

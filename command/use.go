@@ -45,6 +45,10 @@ func usePath(path string) ([]string, error) {
 	if goos == "windows" {
 		log.Printf("JAVA_HOME has been set to %s", path)
 		return []string{
+			"$Env:JAVA_HOME = '" + path + "'",
+			//"$Env:JAVA_HOME",
+			//"$Env:Path += \";%JAVA_HOME%\\bin\"",
+			//"$Env:Path",
 			"[Environment]::SetEnvironmentVariable('JAVA_HOME', '" + path + "', 'User')",
 			"$envPath = [Environment]::GetEnvironmentVariable('Path','User').replace('%JAVA_HOME%\\bin;', '')",
 			"$newPath = '%JAVA_HOME%\\bin;' + $envPath",
