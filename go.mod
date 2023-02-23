@@ -13,8 +13,7 @@ require (
 	github.com/spf13/pflag v0.0.0-20151218134703-7f60f83a2c81
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
-	golang.org/x/sys v0.0.0-20160322232243-afce3de5756c // indirect
-	golang.org/x/text v0.3.6
+	golang.org/x/text v0.3.8
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.0.0-20160928153709-a5b47d31c556
 )
